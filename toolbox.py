@@ -157,6 +157,13 @@ class MatMul(Function):
         self.M.backward(grad)
         grad = self.M.data.T @ dLdf
         self.v.backward(grad)
+        ######################
+        #
+        # self.M.backward(dLdf @ self.v.data.T)
+        # self.v.backward(self.M.data.T @ dLdf)
+        #
+        ##
+        
 
 
 class ReLU(Function):
@@ -237,7 +244,11 @@ class Sum(Function):
         exp = np.expand_dims(dLdf, axis = self.dim) 
         grad = np.repeat(exp, self.t.data.shape[self.dim], axis=self.dim) 
         self.t.backward(grad)
-       
+        ##########
+        #
+        # grad = np.ones_like(self.t.data) * dLdf
+        # self.t.backward()
+        #
 
 
 class Mean(Function):
@@ -269,8 +280,8 @@ class GetItem(Function):
     
     def backward(self, dLdf):
         # implement the backward pass of GetItem
-        grad = np.zeros_like(self.t.data) * dLdf
-        grad[self.index] = 1 * dLdf
-        self.t.backward(grad)
+        grad = np.zeros_like(self.t.data) 
+        grad[self.index] = 1
+        self.t.backward(grad  * dLdf)
         
 
